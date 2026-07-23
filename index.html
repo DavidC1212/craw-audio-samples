@@ -12,9 +12,17 @@
     audio/wmcodec/clip{N}.wav
     audio/craw/clip{N}.wav
 
-  N currently runs 1-4. To add/remove clips, copy or delete a whole
-  <section class="clip"> block and update N in every src path and the
-  heading text.
+  N currently runs 1-4, one <tr> per clip in the single comparison table
+  below (methods are columns, not repeated per-clip sections). To add or
+  remove a clip, copy/delete a whole <tr> in <tbody> and update its row
+  label + every src path.
+
+  Players are custom (play button + draggable seek range + elapsed time),
+  not the native <audio controls> UI -- native Safari controls collapse to
+  a play-button-only widget below ~300px, which is narrower than a table
+  column here. Each <audio> element has no `controls` attribute; all UI is
+  driven by the <script> at the bottom, keyed off the shared `.cell` class
+  each <td> carries.
 -->
 <html lang="en">
 <head>
@@ -33,7 +41,7 @@
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     color: var(--ink);
-    max-width: 980px;
+    max-width: 1180px;
     margin: 0 auto;
     padding: 48px 24px 96px;
     line-height: 1.5;
@@ -45,41 +53,73 @@
   p.subtitle {
     color: var(--muted);
     margin-top: 0;
-    margin-bottom: 40px;
+    margin-bottom: 32px;
   }
-  section.clip {
-    margin-bottom: 56px;
-  }
-  section.clip h2 {
-    font-size: 1.15rem;
-    border-bottom: 1px solid var(--line);
-    padding-bottom: 8px;
-    margin-bottom: 20px;
-  }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    gap: 16px;
-  }
-  .cell {
+
+  /* --- table shell --- */
+  .table-wrap {
     border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 14px 16px;
-    background: #fafafa;
+    border-radius: 14px;
+    overflow: auto;
+    max-height: 82vh;
   }
-  .cell.craw {
-    background: var(--craw-bg);
-    border-color: #bcdcff;
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 1150px;
   }
-  .cell .label {
+  col.col-label { width: 110px; }
+  col.col-method { width: 150px; }
+
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #fff;
+    text-align: left;
+    font-size: 0.85rem;
     font-weight: 600;
-    font-size: 0.92rem;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    padding: 16px;
+    border-bottom: 1px solid var(--line);
   }
-  .cell .label .tag {
+  thead th.craw-col {
+    background: var(--craw-bg);
+  }
+  thead th.row-label-col {
+    z-index: 3;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  tbody th, tbody td {
+    padding: 14px 16px;
+    vertical-align: middle;
+  }
+  tbody tr:not(:last-child) th,
+  tbody tr:not(:last-child) td {
+    border-bottom: 1px solid var(--line);
+  }
+  tbody tr:hover td:not(.craw-col) {
+    background: #f5f7fa;
+  }
+
+  .row-label-col {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: #fff;
+    font-weight: 700;
+    font-size: 0.92rem;
+    text-align: left;
+    border-right: 1px solid var(--line);
+    white-space: nowrap;
+  }
+
+  td.craw-col {
+    background: var(--craw-bg);
+  }
+
+  .tag {
     font-weight: 500;
     font-size: 0.72rem;
     color: var(--accent);
@@ -87,13 +127,105 @@
     border: 1px solid #bcdcff;
     border-radius: 999px;
     padding: 1px 8px;
+    margin-left: 6px;
+    white-space: nowrap;
   }
-  audio {
-    width: 100%;
-    height: 34px;
+
+  /* --- player --- */
+  .player {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
   }
+  .play-btn {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: none;
+    background: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+  }
+  .play-btn:hover { background: #545c66; }
+  .craw-col .play-btn { background: var(--accent); }
+  .craw-col .play-btn:hover { background: #094fd6; }
+  .play-btn .icon-play {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 5px 0 5px 9px;
+    border-color: transparent transparent transparent #fff;
+    margin-left: 2px;
+  }
+  .play-btn .icon-pause {
+    display: none;
+    gap: 3px;
+  }
+  .play-btn .icon-pause span {
+    width: 3px;
+    height: 11px;
+    background: #fff;
+    display: block;
+    border-radius: 1px;
+  }
+  .play-btn.is-playing .icon-play { display: none; }
+  .play-btn.is-playing .icon-pause { display: flex; }
+  .seek {
+    flex: 1;
+    min-width: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .time {
+    font-variant-numeric: tabular-nums;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  .waveform {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 12px;
+    flex-shrink: 0;
+  }
+  .waveform span {
+    display: block;
+    width: 2px;
+    height: 3px;
+    border-radius: 1px;
+    background: var(--muted);
+    opacity: 0.4;
+    transition: background 0.15s ease, opacity 0.15s ease;
+  }
+  .waveform.playing span {
+    background: var(--accent);
+    opacity: 1;
+    animation: wm-bounce 0.9s ease-in-out infinite;
+  }
+  .waveform.playing span:nth-child(1) { animation-delay: -0.6s; }
+  .waveform.playing span:nth-child(2) { animation-delay: -0.3s; }
+  .waveform.playing span:nth-child(3) { animation-delay: 0s; }
+  .waveform.playing span:nth-child(4) { animation-delay: -0.45s; }
+  .waveform.playing span:nth-child(5) { animation-delay: -0.15s; }
+  @keyframes wm-bounce {
+    0%, 100% { height: 3px; }
+    50% { height: 12px; }
+  }
+
   footer {
-    margin-top: 64px;
+    margin-top: 40px;
     color: var(--muted);
     font-size: 0.85rem;
     border-top: 1px solid var(--line);
@@ -106,201 +238,552 @@
 <h1>CRAW: Audio Samples</h1>
 <p class="subtitle">Watermarked audio from CRAW and baseline methods, unmodified (no attacks applied) &mdash; for perceptual quality comparison. Anonymous submission.</p>
 
-<section class="clip">
-  <h2>Clip 1</h2>
-  <div class="grid">
-    <div class="cell">
-      <div class="label">Original (unwatermarked)</div>
-      <audio controls preload="none">
-        <source src="audio/original/clip1.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">WavMark</div>
-      <audio controls preload="none">
-        <source src="audio/wavmark/clip1.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">AudioSeal</div>
-      <audio controls preload="none">
-        <source src="audio/audioseal/clip1.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">TimbreWM</div>
-      <audio controls preload="none">
-        <source src="audio/timbrewm/clip1.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">AWARE</div>
-      <audio controls preload="none">
-        <source src="audio/aware/clip1.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">WMCodec</div>
-      <audio controls preload="none">
-        <source src="audio/wmcodec/clip1.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell craw">
-      <div class="label">CRAW <span class="tag">Ours</span></div>
-      <audio controls preload="none">
-        <source src="audio/craw/clip1.wav" type="audio/wav">
-      </audio>
-    </div>
-  </div>
-</section>
-
-<section class="clip">
-  <h2>Clip 2</h2>
-  <div class="grid">
-    <div class="cell">
-      <div class="label">Original (unwatermarked)</div>
-      <audio controls preload="none">
-        <source src="audio/original/clip2.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">WavMark</div>
-      <audio controls preload="none">
-        <source src="audio/wavmark/clip2.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">AudioSeal</div>
-      <audio controls preload="none">
-        <source src="audio/audioseal/clip2.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">TimbreWM</div>
-      <audio controls preload="none">
-        <source src="audio/timbrewm/clip2.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">AWARE</div>
-      <audio controls preload="none">
-        <source src="audio/aware/clip2.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">WMCodec</div>
-      <audio controls preload="none">
-        <source src="audio/wmcodec/clip2.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell craw">
-      <div class="label">CRAW <span class="tag">Ours</span></div>
-      <audio controls preload="none">
-        <source src="audio/craw/clip2.wav" type="audio/wav">
-      </audio>
-    </div>
-  </div>
-</section>
-
-<section class="clip">
-  <h2>Clip 3</h2>
-  <div class="grid">
-    <div class="cell">
-      <div class="label">Original (unwatermarked)</div>
-      <audio controls preload="none">
-        <source src="audio/original/clip3.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">WavMark</div>
-      <audio controls preload="none">
-        <source src="audio/wavmark/clip3.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">AudioSeal</div>
-      <audio controls preload="none">
-        <source src="audio/audioseal/clip3.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">TimbreWM</div>
-      <audio controls preload="none">
-        <source src="audio/timbrewm/clip3.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">AWARE</div>
-      <audio controls preload="none">
-        <source src="audio/aware/clip3.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">WMCodec</div>
-      <audio controls preload="none">
-        <source src="audio/wmcodec/clip3.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell craw">
-      <div class="label">CRAW <span class="tag">Ours</span></div>
-      <audio controls preload="none">
-        <source src="audio/craw/clip3.wav" type="audio/wav">
-      </audio>
-    </div>
-  </div>
-</section>
-
-<section class="clip">
-  <h2>Clip 4</h2>
-  <div class="grid">
-    <div class="cell">
-      <div class="label">Original (unwatermarked)</div>
-      <audio controls preload="none">
-        <source src="audio/original/clip4.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">WavMark</div>
-      <audio controls preload="none">
-        <source src="audio/wavmark/clip4.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">AudioSeal</div>
-      <audio controls preload="none">
-        <source src="audio/audioseal/clip4.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">TimbreWM</div>
-      <audio controls preload="none">
-        <source src="audio/timbrewm/clip4.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">AWARE</div>
-      <audio controls preload="none">
-        <source src="audio/aware/clip4.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell">
-      <div class="label">WMCodec</div>
-      <audio controls preload="none">
-        <source src="audio/wmcodec/clip4.wav" type="audio/wav">
-      </audio>
-    </div>
-    <div class="cell craw">
-      <div class="label">CRAW <span class="tag">Ours</span></div>
-      <audio controls preload="none">
-        <source src="audio/craw/clip4.wav" type="audio/wav">
-      </audio>
-    </div>
-  </div>
-</section>
+<div class="table-wrap">
+<table>
+  <colgroup>
+    <col class="col-label">
+    <col class="col-method"><col class="col-method"><col class="col-method">
+    <col class="col-method"><col class="col-method"><col class="col-method">
+    <col class="col-method">
+  </colgroup>
+  <thead>
+    <tr>
+      <th scope="col" class="row-label-col">Clip</th>
+      <th scope="col">Original</th>
+      <th scope="col">WavMark</th>
+      <th scope="col">AudioSeal</th>
+      <th scope="col">TimbreWM</th>
+      <th scope="col">AWARE</th>
+      <th scope="col">WMCodec</th>
+      <th scope="col" class="craw-col">CRAW <span class="tag">Ours</span></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row" class="row-label-col">Clip 1</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play Original, Clip 1">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek Original, Clip 1">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/original/clip1.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play WavMark, Clip 1">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek WavMark, Clip 1">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/wavmark/clip1.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play AudioSeal, Clip 1">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek AudioSeal, Clip 1">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/audioseal/clip1.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play TimbreWM, Clip 1">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek TimbreWM, Clip 1">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/timbrewm/clip1.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play AWARE, Clip 1">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek AWARE, Clip 1">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/aware/clip1.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play WMCodec, Clip 1">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek WMCodec, Clip 1">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/wmcodec/clip1.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play CRAW, Clip 1">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek CRAW, Clip 1">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/craw/clip1.wav" type="audio/wav">
+        </audio>
+      </td>
+    </tr>
+    <tr>
+      <th scope="row" class="row-label-col">Clip 2</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play Original, Clip 2">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek Original, Clip 2">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/original/clip2.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play WavMark, Clip 2">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek WavMark, Clip 2">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/wavmark/clip2.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play AudioSeal, Clip 2">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek AudioSeal, Clip 2">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/audioseal/clip2.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play TimbreWM, Clip 2">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek TimbreWM, Clip 2">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/timbrewm/clip2.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play AWARE, Clip 2">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek AWARE, Clip 2">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/aware/clip2.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play WMCodec, Clip 2">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek WMCodec, Clip 2">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/wmcodec/clip2.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play CRAW, Clip 2">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek CRAW, Clip 2">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/craw/clip2.wav" type="audio/wav">
+        </audio>
+      </td>
+    </tr>
+    <tr>
+      <th scope="row" class="row-label-col">Clip 3</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play Original, Clip 3">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek Original, Clip 3">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/original/clip3.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play WavMark, Clip 3">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek WavMark, Clip 3">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/wavmark/clip3.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play AudioSeal, Clip 3">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek AudioSeal, Clip 3">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/audioseal/clip3.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play TimbreWM, Clip 3">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek TimbreWM, Clip 3">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/timbrewm/clip3.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play AWARE, Clip 3">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek AWARE, Clip 3">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/aware/clip3.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play WMCodec, Clip 3">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek WMCodec, Clip 3">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/wmcodec/clip3.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play CRAW, Clip 3">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek CRAW, Clip 3">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/craw/clip3.wav" type="audio/wav">
+        </audio>
+      </td>
+    </tr>
+    <tr>
+      <th scope="row" class="row-label-col">Clip 4</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play Original, Clip 4">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek Original, Clip 4">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/original/clip4.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play WavMark, Clip 4">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek WavMark, Clip 4">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/wavmark/clip4.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play AudioSeal, Clip 4">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek AudioSeal, Clip 4">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/audioseal/clip4.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play TimbreWM, Clip 4">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek TimbreWM, Clip 4">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/timbrewm/clip4.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play AWARE, Clip 4">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek AWARE, Clip 4">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/aware/clip4.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play WMCodec, Clip 4">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek WMCodec, Clip 4">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/wmcodec/clip4.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play CRAW, Clip 4">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek CRAW, Clip 4">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/craw/clip4.wav" type="audio/wav">
+        </audio>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 <footer>
   Samples are provided for review purposes. This page contains no information identifying the authors.
 </footer>
+
+<script>
+  function formatTime(t) {
+    if (!isFinite(t) || t < 0) t = 0;
+    var m = Math.floor(t / 60);
+    var s = Math.floor(t % 60);
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  document.querySelectorAll('.cell').forEach(function (cell) {
+    var audio = cell.querySelector('audio');
+    var waveform = cell.querySelector('.waveform');
+    var btn = cell.querySelector('.play-btn');
+    var seek = cell.querySelector('.seek');
+    var timeEl = cell.querySelector('.time');
+    if (!audio || !btn || !seek || !timeEl) return;
+
+    var scrubbing = false;
+
+    audio.addEventListener('loadedmetadata', function () {
+      if (isFinite(audio.duration)) seek.max = audio.duration;
+    });
+
+    audio.addEventListener('timeupdate', function () {
+      if (!scrubbing) seek.value = audio.currentTime;
+      timeEl.textContent = formatTime(audio.currentTime);
+    });
+
+    audio.addEventListener('play', function () {
+      btn.classList.add('is-playing');
+      waveform.classList.add('playing');
+      btn.setAttribute('aria-label', btn.getAttribute('aria-label').replace('Play', 'Pause'));
+    });
+    audio.addEventListener('pause', function () {
+      btn.classList.remove('is-playing');
+      waveform.classList.remove('playing');
+      btn.setAttribute('aria-label', btn.getAttribute('aria-label').replace('Pause', 'Play'));
+    });
+    audio.addEventListener('ended', function () {
+      btn.classList.remove('is-playing');
+      waveform.classList.remove('playing');
+    });
+
+    btn.addEventListener('click', function () {
+      if (audio.paused) audio.play(); else audio.pause();
+    });
+
+    seek.addEventListener('mousedown', function () { scrubbing = true; });
+    seek.addEventListener('touchstart', function () { scrubbing = true; });
+    seek.addEventListener('input', function () {
+      audio.currentTime = parseFloat(seek.value);
+      timeEl.textContent = formatTime(seek.value);
+    });
+    seek.addEventListener('change', function () { scrubbing = false; });
+    window.addEventListener('mouseup', function () { scrubbing = false; });
+    window.addEventListener('touchend', function () { scrubbing = false; });
+  });
+</script>
 
 </body>
 </html>
