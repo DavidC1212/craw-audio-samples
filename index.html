@@ -2,27 +2,39 @@
 <!--
   Audio samples page for the CRAW submission (anonymous, double-blind).
 
-  Files live under audio/<method>/clip{N}.wav, one subfolder per method:
+  Two sections:
 
-    audio/original/clip{N}.wav
-    audio/wavmark/clip{N}.wav
-    audio/audioseal/clip{N}.wav
-    audio/timbrewm/clip{N}.wav
-    audio/aware/clip{N}.wav
-    audio/wmcodec/clip{N}.wav
-    audio/craw/clip{N}.wav
+  1) Component Ablation (primary) -- the SAME clip run through each stage
+     of CRAW's pipeline, so a listener can hear the fidelity recovery
+     across DL -> +QFormer -> +Mask -> +ECC (full CRAW). Files live at:
 
-  N currently runs 1-4, one <tr> per clip in the single comparison table
-  below (methods are columns, not repeated per-clip sections). To add or
-  remove a clip, copy/delete a whole <tr> in <tbody> and update its row
-  label + every src path.
+       audio/ablation/dl/clip{N}.wav
+       audio/ablation/qformer/clip{N}.wav
+       audio/ablation/mask/clip{N}.wav
+       audio/ablation/ecc/clip{N}.wav
+
+     N runs 1-20. This mirrors the paper's tab:ablation_fidelity /
+     tab:ablation_robustness column order and labels (Baseline column
+     omitted here per scope -- this section starts at +DL).
+
+  2) vs. Baselines (secondary) -- CRAW against the external baselines,
+     unchanged from the previous version of this page:
+
+       audio/original/clip{N}.wav
+       audio/wavmark/clip{N}.wav
+       audio/audioseal/clip{N}.wav
+       audio/timbrewm/clip{N}.wav
+       audio/aware/clip{N}.wav
+       audio/wmcodec/clip{N}.wav
+       audio/craw/clip{N}.wav
+
+     N runs 1-4.
 
   Players are custom (play button + draggable seek range + elapsed time),
   not the native <audio controls> UI -- native Safari controls collapse to
-  a play-button-only widget below ~300px, which is narrower than a table
-  column here. Each <audio> element has no `controls` attribute; all UI is
-  driven by the <script> at the bottom, keyed off the shared `.cell` class
-  each <td> carries.
+  a play-button-only widget below ~300px. Each <audio> element has no
+  `controls` attribute; all UI is driven by the <script> at the bottom,
+  keyed off the shared `.cell` class each <td> carries.
 -->
 <html lang="en">
 <head>
@@ -53,7 +65,22 @@
   p.subtitle {
     color: var(--muted);
     margin-top: 0;
-    margin-bottom: 32px;
+    margin-bottom: 40px;
+  }
+
+  section.block {
+    margin-bottom: 56px;
+  }
+  section.block h2 {
+    font-size: 1.25rem;
+    margin-bottom: 6px;
+  }
+  section.block p.section-desc {
+    color: var(--muted);
+    font-size: 0.92rem;
+    margin-top: 0;
+    margin-bottom: 18px;
+    max-width: 760px;
   }
 
   /* --- table shell --- */
@@ -66,7 +93,6 @@
   table {
     border-collapse: collapse;
     width: 100%;
-    min-width: 1150px;
   }
   col.col-label { width: 110px; }
   col.col-method { width: 150px; }
@@ -236,31 +262,1398 @@
 <body>
 
 <h1>CRAW: Audio Samples</h1>
-<p class="subtitle">Watermarked audio from CRAW and baseline methods, unmodified (no attacks applied) &mdash; for perceptual quality comparison. Anonymous submission.</p>
+<p class="subtitle">Anonymous submission. All clips are unmodified (no attacks applied) &mdash; for perceptual quality comparison.</p>
 
-<div class="table-wrap">
-<table>
-  <colgroup>
-    <col class="col-label">
-    <col class="col-method"><col class="col-method"><col class="col-method">
-    <col class="col-method"><col class="col-method"><col class="col-method">
-    <col class="col-method">
-  </colgroup>
-  <thead>
-    <tr>
-      <th scope="col" class="row-label-col">Clip</th>
-      <th scope="col">Original</th>
-      <th scope="col">WavMark</th>
-      <th scope="col">AudioSeal</th>
-      <th scope="col">TimbreWM</th>
-      <th scope="col">AWARE</th>
-      <th scope="col">WMCodec</th>
-      <th scope="col" class="craw-col">CRAW <span class="tag">Ours</span></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row" class="row-label-col">Clip 1</th>
+<section class="block">
+  <h2>Component Ablation</h2>
+  <p class="section-desc">The same clip watermarked at each stage of CRAW's design, so you can hear the fidelity recovery directly: Q-Former pooling and inference-time masking recover most of the perceptual quality given up when the robust distortion layer (DL) is added, at a small further cost from the final error-correcting code (+ECC, full CRAW).</p>
+  <div class="table-wrap">
+  <table>
+    <colgroup>
+      <col class="col-label">
+      <col class="col-method"><col class="col-method"><col class="col-method"><col class="col-method">
+    </colgroup>
+    <thead>
+      <tr>
+        <th scope="col" class="row-label-col">Clip</th>
+        <th scope="col">DL</th>
+        <th scope="col">+QFormer</th>
+        <th scope="col">+Mask</th>
+        <th scope="col" class="craw-col">+ECC <span class="tag">Full CRAW</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 1</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 1">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 1">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip1.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 1">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 1">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip1.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 1">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 1">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip1.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 1">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 1">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip1.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 2</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 2">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 2">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip2.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 2">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 2">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip2.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 2">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 2">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip2.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 2">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 2">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip2.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 3</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 3">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 3">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip3.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 3">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 3">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip3.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 3">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 3">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip3.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 3">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 3">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip3.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 4</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 4">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 4">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip4.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 4">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 4">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip4.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 4">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 4">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip4.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 4">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 4">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip4.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 5</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 5">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 5">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip5.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 5">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 5">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip5.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 5">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 5">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip5.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 5">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 5">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip5.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 6</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 6">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 6">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip6.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 6">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 6">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip6.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 6">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 6">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip6.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 6">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 6">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip6.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 7</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 7">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 7">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip7.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 7">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 7">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip7.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 7">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 7">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip7.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 7">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 7">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip7.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 8</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 8">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 8">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip8.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 8">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 8">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip8.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 8">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 8">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip8.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 8">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 8">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip8.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 9</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 9">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 9">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip9.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 9">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 9">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip9.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 9">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 9">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip9.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 9">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 9">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip9.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 10</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 10">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 10">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip10.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 10">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 10">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip10.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 10">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 10">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip10.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 10">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 10">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip10.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 11</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 11">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 11">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip11.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 11">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 11">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip11.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 11">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 11">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip11.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 11">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 11">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip11.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 12</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 12">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 12">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip12.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 12">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 12">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip12.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 12">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 12">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip12.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 12">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 12">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip12.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 13</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 13">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 13">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip13.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 13">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 13">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip13.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 13">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 13">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip13.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 13">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 13">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip13.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 14</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 14">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 14">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip14.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 14">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 14">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip14.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 14">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 14">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip14.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 14">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 14">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip14.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 15</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 15">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 15">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip15.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 15">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 15">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip15.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 15">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 15">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip15.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 15">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 15">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip15.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 16</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 16">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 16">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip16.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 16">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 16">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip16.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 16">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 16">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip16.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 16">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 16">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip16.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 17</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 17">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 17">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip17.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 17">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 17">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip17.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 17">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 17">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip17.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 17">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 17">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip17.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 18</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 18">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 18">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip18.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 18">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 18">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip18.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 18">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 18">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip18.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 18">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 18">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip18.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 19</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 19">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 19">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip19.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 19">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 19">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip19.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 19">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 19">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip19.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 19">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 19">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip19.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 20</th>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play DL, Clip 20">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek DL, Clip 20">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/dl/clip20.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +QFormer, Clip 20">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +QFormer, Clip 20">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/qformer/clip20.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +Mask, Clip 20">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +Mask, Clip 20">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/mask/clip20.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play +ECC, Clip 20">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek +ECC, Clip 20">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/ablation/ecc/clip20.wav" type="audio/wav">
+        </audio>
+      </td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section class="block">
+  <h2>vs. Baselines</h2>
+  <p class="section-desc">CRAW (full model) against the external baselines: WavMark, AudioSeal, TimbreWM, AWARE, and WMCodec, plus the original unwatermarked clip for reference.</p>
+  <div class="table-wrap">
+  <table>
+    <colgroup>
+      <col class="col-label">
+      <col class="col-method"><col class="col-method"><col class="col-method">
+      <col class="col-method"><col class="col-method"><col class="col-method">
+      <col class="col-method">
+    </colgroup>
+    <thead>
+      <tr>
+        <th scope="col" class="row-label-col">Clip</th>
+        <th scope="col">Original</th>
+        <th scope="col">WavMark</th>
+        <th scope="col">AudioSeal</th>
+        <th scope="col">TimbreWM</th>
+        <th scope="col">AWARE</th>
+        <th scope="col">WMCodec</th>
+        <th scope="col" class="craw-col">CRAW <span class="tag">Ours</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 1</th>
       <td class="cell">
         <div class="player">
           <button class="play-btn" type="button" aria-label="Play Original, Clip 1">
@@ -373,9 +1766,9 @@
           <source src="audio/craw/clip1.wav" type="audio/wav">
         </audio>
       </td>
-    </tr>
-    <tr>
-      <th scope="row" class="row-label-col">Clip 2</th>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 2</th>
       <td class="cell">
         <div class="player">
           <button class="play-btn" type="button" aria-label="Play Original, Clip 2">
@@ -488,9 +1881,9 @@
           <source src="audio/craw/clip2.wav" type="audio/wav">
         </audio>
       </td>
-    </tr>
-    <tr>
-      <th scope="row" class="row-label-col">Clip 3</th>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 3</th>
       <td class="cell">
         <div class="player">
           <button class="play-btn" type="button" aria-label="Play Original, Clip 3">
@@ -603,9 +1996,9 @@
           <source src="audio/craw/clip3.wav" type="audio/wav">
         </audio>
       </td>
-    </tr>
-    <tr>
-      <th scope="row" class="row-label-col">Clip 4</th>
+      </tr>
+      <tr>
+        <th scope="row" class="row-label-col">Clip 4</th>
       <td class="cell">
         <div class="player">
           <button class="play-btn" type="button" aria-label="Play Original, Clip 4">
@@ -718,10 +2111,11 @@
           <source src="audio/craw/clip4.wav" type="audio/wav">
         </audio>
       </td>
-    </tr>
-  </tbody>
-</table>
-</div>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</section>
 
 <footer>
   Samples are provided for review purposes. This page contains no information identifying the authors.
