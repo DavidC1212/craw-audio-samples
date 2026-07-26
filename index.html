@@ -24,17 +24,17 @@
   2) vs. Baselines (secondary) -- CRAW against the external baselines:
 
        audio/original/clip{N}.wav
+       audio/craw/clip{N}.wav
        audio/wavmark/clip{N}.wav
        audio/audioseal/clip{N}.wav
        audio/timbrewm/clip{N}.wav
        audio/aware/clip{N}.wav
        audio/wmcodec/clip{N}.wav
-       audio/craw/clip{N}.wav
 
-     N runs 1-6 (bumped from 4 on 2026-07-24; the underlying wavs were
-     also regenerated at that point, so re-copy from
-     RobustTimbreWM/audio/<method>/ rather than assuming old copies
-     are still current if this ever needs re-syncing).
+     N runs 1-6. Column order is deliberately Original, CRAW, then the
+     external baselines (CRAW placed immediately to the right of
+     Original per request 2026-07-26) -- don't revert to
+     Original...baselines...CRAW-last without checking first.
 
   Players are custom (play button + draggable seek range + elapsed time),
   not the native <audio controls> UI -- native Safari controls collapse to
@@ -1970,12 +1970,12 @@
       <tr>
         <th scope="col" class="row-label-col">Clip</th>
         <th scope="col">Original</th>
+        <th scope="col" class="craw-col">CRAW <span class="tag">Ours</span></th>
         <th scope="col">WavMark</th>
         <th scope="col">AudioSeal</th>
         <th scope="col">TimbreWM</th>
         <th scope="col">AWARE</th>
         <th scope="col">WMCodec</th>
-        <th scope="col" class="craw-col">CRAW <span class="tag">Ours</span></th>
       </tr>
     </thead>
     <tbody>
@@ -1995,6 +1995,22 @@
         </div>
         <audio preload="metadata">
           <source src="audio/original/clip1.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play CRAW, Clip 1">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek CRAW, Clip 1">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/craw/clip1.wav" type="audio/wav">
         </audio>
       </td>
       <td class="cell">
@@ -2077,22 +2093,6 @@
           <source src="audio/wmcodec/clip1.wav" type="audio/wav">
         </audio>
       </td>
-      <td class="cell craw-col">
-        <div class="player">
-          <button class="play-btn" type="button" aria-label="Play CRAW, Clip 1">
-            <span class="icon-play"></span>
-            <span class="icon-pause"><span></span><span></span></span>
-          </button>
-          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek CRAW, Clip 1">
-        </div>
-        <div class="meta">
-          <span class="time">0:00</span>
-          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
-        </div>
-        <audio preload="metadata">
-          <source src="audio/craw/clip1.wav" type="audio/wav">
-        </audio>
-      </td>
       </tr>
       <tr>
         <th scope="row" class="row-label-col">Clip 2</th>
@@ -2110,6 +2110,22 @@
         </div>
         <audio preload="metadata">
           <source src="audio/original/clip2.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play CRAW, Clip 2">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek CRAW, Clip 2">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/craw/clip2.wav" type="audio/wav">
         </audio>
       </td>
       <td class="cell">
@@ -2192,22 +2208,6 @@
           <source src="audio/wmcodec/clip2.wav" type="audio/wav">
         </audio>
       </td>
-      <td class="cell craw-col">
-        <div class="player">
-          <button class="play-btn" type="button" aria-label="Play CRAW, Clip 2">
-            <span class="icon-play"></span>
-            <span class="icon-pause"><span></span><span></span></span>
-          </button>
-          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek CRAW, Clip 2">
-        </div>
-        <div class="meta">
-          <span class="time">0:00</span>
-          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
-        </div>
-        <audio preload="metadata">
-          <source src="audio/craw/clip2.wav" type="audio/wav">
-        </audio>
-      </td>
       </tr>
       <tr>
         <th scope="row" class="row-label-col">Clip 3</th>
@@ -2225,6 +2225,22 @@
         </div>
         <audio preload="metadata">
           <source src="audio/original/clip3.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play CRAW, Clip 3">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek CRAW, Clip 3">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/craw/clip3.wav" type="audio/wav">
         </audio>
       </td>
       <td class="cell">
@@ -2307,22 +2323,6 @@
           <source src="audio/wmcodec/clip3.wav" type="audio/wav">
         </audio>
       </td>
-      <td class="cell craw-col">
-        <div class="player">
-          <button class="play-btn" type="button" aria-label="Play CRAW, Clip 3">
-            <span class="icon-play"></span>
-            <span class="icon-pause"><span></span><span></span></span>
-          </button>
-          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek CRAW, Clip 3">
-        </div>
-        <div class="meta">
-          <span class="time">0:00</span>
-          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
-        </div>
-        <audio preload="metadata">
-          <source src="audio/craw/clip3.wav" type="audio/wav">
-        </audio>
-      </td>
       </tr>
       <tr>
         <th scope="row" class="row-label-col">Clip 4</th>
@@ -2340,6 +2340,22 @@
         </div>
         <audio preload="metadata">
           <source src="audio/original/clip4.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play CRAW, Clip 4">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek CRAW, Clip 4">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/craw/clip4.wav" type="audio/wav">
         </audio>
       </td>
       <td class="cell">
@@ -2422,22 +2438,6 @@
           <source src="audio/wmcodec/clip4.wav" type="audio/wav">
         </audio>
       </td>
-      <td class="cell craw-col">
-        <div class="player">
-          <button class="play-btn" type="button" aria-label="Play CRAW, Clip 4">
-            <span class="icon-play"></span>
-            <span class="icon-pause"><span></span><span></span></span>
-          </button>
-          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek CRAW, Clip 4">
-        </div>
-        <div class="meta">
-          <span class="time">0:00</span>
-          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
-        </div>
-        <audio preload="metadata">
-          <source src="audio/craw/clip4.wav" type="audio/wav">
-        </audio>
-      </td>
       </tr>
       <tr>
         <th scope="row" class="row-label-col">Clip 5</th>
@@ -2455,6 +2455,22 @@
         </div>
         <audio preload="metadata">
           <source src="audio/original/clip5.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play CRAW, Clip 5">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek CRAW, Clip 5">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/craw/clip5.wav" type="audio/wav">
         </audio>
       </td>
       <td class="cell">
@@ -2537,22 +2553,6 @@
           <source src="audio/wmcodec/clip5.wav" type="audio/wav">
         </audio>
       </td>
-      <td class="cell craw-col">
-        <div class="player">
-          <button class="play-btn" type="button" aria-label="Play CRAW, Clip 5">
-            <span class="icon-play"></span>
-            <span class="icon-pause"><span></span><span></span></span>
-          </button>
-          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek CRAW, Clip 5">
-        </div>
-        <div class="meta">
-          <span class="time">0:00</span>
-          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
-        </div>
-        <audio preload="metadata">
-          <source src="audio/craw/clip5.wav" type="audio/wav">
-        </audio>
-      </td>
       </tr>
       <tr>
         <th scope="row" class="row-label-col">Clip 6</th>
@@ -2570,6 +2570,22 @@
         </div>
         <audio preload="metadata">
           <source src="audio/original/clip6.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="cell craw-col">
+        <div class="player">
+          <button class="play-btn" type="button" aria-label="Play CRAW, Clip 6">
+            <span class="icon-play"></span>
+            <span class="icon-pause"><span></span><span></span></span>
+          </button>
+          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek CRAW, Clip 6">
+        </div>
+        <div class="meta">
+          <span class="time">0:00</span>
+          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <audio preload="metadata">
+          <source src="audio/craw/clip6.wav" type="audio/wav">
         </audio>
       </td>
       <td class="cell">
@@ -2650,22 +2666,6 @@
         </div>
         <audio preload="metadata">
           <source src="audio/wmcodec/clip6.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="cell craw-col">
-        <div class="player">
-          <button class="play-btn" type="button" aria-label="Play CRAW, Clip 6">
-            <span class="icon-play"></span>
-            <span class="icon-pause"><span></span><span></span></span>
-          </button>
-          <input class="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek CRAW, Clip 6">
-        </div>
-        <div class="meta">
-          <span class="time">0:00</span>
-          <span class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
-        </div>
-        <audio preload="metadata">
-          <source src="audio/craw/clip6.wav" type="audio/wav">
         </audio>
       </td>
       </tr>
