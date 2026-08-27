@@ -263,12 +263,49 @@
     border-top: 1px solid var(--line);
     padding-top: 16px;
   }
+
+  .link-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+  .link-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 0.9rem;
+    background: #fff;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .link-box:hover {
+    border-color: var(--accent);
+    background: var(--craw-bg);
+  }
+  .link-box .link-icon {
+    color: var(--accent);
+  }
 </style>
 </head>
 <body>
 
 <h1>CRAW: Audio Samples</h1>
 <p class="subtitle">David Chernin &amp; Ethan Fetaya, Bar-Ilan University. All clips are unmodified (no attacks applied) &mdash; for perceptual quality comparison.</p>
+
+<div class="link-row">
+  <a class="link-box" href="https://github.com/DavidC1212/craw">
+    <span class="link-icon">&#9646;</span> Code
+  </a>
+  <!-- TODO: replace with the real arXiv URL once submitted and assigned an ID -->
+  <a class="link-box" href="#" title="arXiv link not yet available -- paper not submitted">
+    <span class="link-icon">&#9646;</span> Paper (arXiv)
+  </a>
+</div>
 
 <section class="block">
   <h2>Component Ablation</h2>
